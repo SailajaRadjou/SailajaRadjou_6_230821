@@ -2,6 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
+
+const Sauce = require('./models/Sauce');
+
 mongoose.connect('mongodb+srv://radjou:sailaja@cluster0.5c8jm.mongodb.net/piiquanteDataBase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -20,8 +23,13 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 
 app.post('/api/sauces', (req, res, next) => {
-    console.log(req.body);
-    res.status(200).json({message: 'Object Crée !'});
+    delete req.body._id;
+    const sauce = new Sauce({
+        ...req.body
+    });
+    sauce.save()
+        .then(() => res.status(201).json({ message: 'Object Enregistré !'}))
+        .catch(error => res.status(400).json({ error }))
 });
 
 
