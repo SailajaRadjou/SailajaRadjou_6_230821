@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+//création du model Sauce pour un stockage dans la base de donnée
 const sauceSchema = mongoose.Schema({
   userId: { type: String, required: true },
   name: { type: String, required: true },
