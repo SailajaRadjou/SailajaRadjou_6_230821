@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 const Sauce = require('./models/Sauce');
 
-mongoose.connect('mongodb+srv://radjou:sailaja@cluster0.5c8jm.mongodb.net/piiquanteDataBase?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://RadjouSailaja:mel-ang@cluster0.eeamk.mongodb.net/sauceDatabase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -25,36 +25,35 @@ app.use(bodyParser.json());
 app.post('/api/sauces', (req, res, next) => {
     delete req.body._id;
     const sauce = new Sauce({
-        ...req.body
+     ...req.body
     });
     sauce.save()
         .then(() => res.status(201).json({ message: 'Object Enregistré !'}))
         .catch(error => res.status(400).json({ error }))
 });
 
+app.get('/api/sauces', (req, res, next) => {
+    Sauce.find()
+      .then( sauces => res.status(200).json(sauces))
+      .catch(error => res.status(400).json({ error }));
+});
 
-app.use('/api/sauces', (req, res, next) => {
-    const sauces = [
-      {
-        _id: 'oeihfzeoi',
-        name: 'Purée de piment antillais',
-        manufacturer: 'Fabricant de la sauce',
-        description: 'La purée de piment Dame Besson est composée de : piment antillais, huile de tournesol, vinaigre, sel. Antioxydant: acide ascorbique Sans colorant, sans conservateur ! ',
-        mainPepper: 'Le Piment— le principal ingrédient épicé de la sauce',
-        imageUrl: 'https://www.tilolo.fr/img/152/79416/m/p/puree-de-piment-antillais.jpg',
-        userId: 'qsomihvqios',
-      },
-      {
-        _id: 'oeihfzeomoihi',
-        name: 'Sauce Yassa BIO',
-        manufacturer: 'Yassa',
-        description: 'Eau, oignons, jus de citron, coriandre, persil, gingembre, ail, laurier, sel de Guérande. ',
-        mainPepper: 'Poulet — le principal ingrédient épicé de la sauce',
-        imageUrl: 'http://chef-gondo.com/site/wp-content/uploads/2018/08/Capture-d%E2%80%99e%CC%81cran-2018-05-09-a%CC%80-18.07.23.png',
-        userId: 'qsomihvqios',
-      },
-    ];
-    res.status(201).json(sauces);
+app.get('/api/sauces/:id', (req, res, next) => {
+  Sauce.findOne({ _id: req.params.id })
+    .then(sauce => res.status(200).json(sauce))
+    .catch(error => res.status(404).json({ error }));
+});
+
+app.put('/api/sauces/:id', (req, res, next) => {
+  Sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+  .then(() => res.status(200).json({ message: 'Object Modifié ! '}))
+  .catch(error => res.status(400).json({ error }));
+});
+
+app.delete('/api/sauces/:id', (req, res, next) => {
+  Sauce.deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Objet Supprimé !'}))
+    .catch(error => res.status(400).json({ error }));
 });
 
 module.exports = app;
