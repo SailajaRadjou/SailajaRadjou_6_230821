@@ -1,19 +1,26 @@
+//importation de express
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const mongoose = require('mongoose');
 const path = require('path');
+const mongoose = require('mongoose');
+
+require('dotenv').config();
+
 
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
 
-//connexion à la base de donnée MongoDB
-mongoose.connect('mongodb+srv://RadjouSailaja:mel-ang@cluster0.eeamk.mongodb.net/sauceDatabase?retryWrites=true&w=majority',
-  { useNewUrlParser: true,
-    useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
 
+
+//connexion à la base de donnée MongoDB
+mongoose.connect
+(
+    process.env.MONGO_URI, 
+    { useNewUrlParser: true, useUnifiedTopology: true }
+)
+.then(() => console.log('Connexion à MongoDB réussie !'))
+.catch(() => console.log('Connexion à MongoDB échouée !'));
 const app = express();
 
 //définition de headers pour éviter les erreurs de CORS
