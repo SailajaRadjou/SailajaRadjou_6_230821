@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 
+require('dotenv').config();
+
 //création de nouveau utilisateur SIGNUP
 exports.signup = (req, res, next) => {
     //HASH du mot de passe avec le bcrypt
@@ -37,7 +39,7 @@ exports.login = (req, res, next) => {
                         //créé le token pour sécuriser le compte de l'utilisateur
                         token: jwt.sign(
                             { userId: user._id },
-                            'RANDOM_TOKEN_SECRET',
+                            `${process.env.RANDOM_TOKEN}`,
                             { expiresIn: '24h' }
                         )
                     });
