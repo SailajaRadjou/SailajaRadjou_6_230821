@@ -10,8 +10,15 @@ exports.signup = (req, res, next) => {
     //HASH du mot de passe avec le bcrypt
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
+             
+            //console.log(Buffer.from('Hello World').toString('base64'));
+            console.log("Signed in User_id : "+req.body.email);
+            
+            // Masquage de l'adresse mail
+            let buff = Buffer.from(req.body.email);
+            let emailInbase64 = buff.toString('base64');    
             const user = new User({
-                email: req.body.email,
+                email: emailInbase64,
                 password: hash
             });
             //sauvegarde dans la base de donnée
@@ -24,7 +31,13 @@ exports.signup = (req, res, next) => {
 
 //Création connexion pour les utilisateur déja enregistré LOGIN
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email })
+
+    // Masquage de l'adresse mail
+    let bufferEmail = Buffer.from(req.body.email).toString('base64');
+    
+    console.log("Logged in User_id : "+req.body.email);
+
+    User.findOne({ email: bufferEmail })
         .then(user => {
             if (!user) {
                 return res.status(401).json({ error: 'Utilisateur Non Trouvé ! ' });
