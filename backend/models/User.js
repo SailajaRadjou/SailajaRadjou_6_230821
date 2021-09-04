@@ -1,3 +1,4 @@
+//importe mongoose
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 //création du model User pour un stockage dans la base de donnée
