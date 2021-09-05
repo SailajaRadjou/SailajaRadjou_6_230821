@@ -32,7 +32,7 @@ exports.signup = (req, res, next) => {
             //sauvegarde dans la base de donnée
             user.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur Créé !'}))
-                .catch(error => res.status(400).json({ error}));//Error : Si il existe déjà un utilisateur avec cette adresse email
+                .catch(error => res.status(409).json({  message: "Désolé l'utilisateur Existe Déja !"}));//Error : Si il existe déjà un utilisateur avec cette adresse email
         })
         .catch(error => res.status(500).json({ error }));
 };
@@ -40,7 +40,7 @@ exports.signup = (req, res, next) => {
 //Création connexion pour les utilisateur déja enregistré LOGIN
 exports.login = (req, res, next) => {
 
-    // Masquage de l'adresse mail
+    // Masqué de l'adresse mail
     let bufferEmail = Buffer.from(req.body.email).toString('base64');
     
     console.log("Logged in User_id : "+req.body.email);
@@ -48,14 +48,14 @@ exports.login = (req, res, next) => {
     User.findOne({ email: bufferEmail })
         .then(user => {
             if (!user) {
-                return res.status(401).json({ error: 'Utilisateur Non Trouvé ! ' });
+                return res.status(401).json({ message: 'Utilisateur Non Trouvé ! ' });
             }
              // On utilise bcrypt pour comparer les hashs et savoir si ils ont la même string d'origine
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
                     // Si false, c'est que ce n'est pas le bon utilisateur, ou le mot de passe est incorrect
                     if (!valid) {
-                        return res.status(401).json({ error: 'Mot de Passe Incorrect ! ' });
+                        return res.status(401).json({ message: 'Mot de Passe Incorrect ! ' });
                     }
                     // Si true, on renvoie un statut 200 et un objet JSON avec un userID + un token
                     res.status(200).json({
