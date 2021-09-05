@@ -13,9 +13,7 @@ https://github.com/SailajaRadjou/SailajaRadjou_6_230821.git
 
 ## Piquante - Backend :
 
-Depuis le dossier backend, télécharger et installer Node.js
-
-Lancer node avec npm start
+Depuis le dossier backend, télécharger et installer Node.js 14.0.
 
 Lancer le serveur avec nodemon server
 
