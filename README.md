@@ -13,21 +13,24 @@ https://github.com/SailajaRadjou/SailajaRadjou_6_230821.git
 
 ## Piquante - Backend :
 
-Depuis le dossier backend, télécharger et installer Node.js 14.0.
+Depuis le dossier backend, 
 
-Lancer le serveur avec nodemon server
+    - créer un fichier ".env" et y implémenter les lignes de code qui vous ont été envoyées séparément,
+    - penser à bien enregistrer,
 
+    - puis, toujours dans le terminal ouvert dans le dossier backend:    
+        -taper: "npm install",
+        -puis: "nodemon server",
+       
 Le serveur sera accessible sur http://localhost:3000/
 
 ## Piquante - Frontend :
 
 Depuis le dossier frontend,
 
-Installer @Angular/CLI avec npm install -g @angular/cli
-
-Installer node-sass avec npm install node-sass
-
-Lancer le serveur avec npm start
+    - taper: "npm install",
+    - puis: "npm start",
+    - enfin: dans votre navigateur se rendre à l'adresse: http://localhost:4200 
 
 Si votre navigateur ne démarre pas ou affiche une erreur 404, accédez à http://localhost:8081 dans votre navigateur.
 
