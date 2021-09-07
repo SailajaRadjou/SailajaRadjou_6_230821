@@ -11,8 +11,12 @@ require('dotenv').config();
 
 //création de nouveau utilisateur SIGNUP
 exports.signup = (req, res, next) => {
-    //HASH du mot de passe avec le bcrypt & (10) ce sera le nombre de tours qu'on fait faire à l'algorithme
-    bcrypt.hash(req.body.password, 10)
+    if (!/^([a-z0-9]){6,}$/.test(req.body.password)) {
+        return res.status(400).json({ message: 'Invalid password -- Minimum 6 letters & Special characters not allowed !'});
+    }
+    else{
+        //HASH du mot de passe avec le bcrypt & (10) ce sera le nombre de tours qu'on fait faire à l'algorithme
+        bcrypt.hash(req.body.password, 10)
         .then(hash => {
              
             //console.log(Buffer.from('Hello World').toString('base64'));
@@ -35,6 +39,7 @@ exports.signup = (req, res, next) => {
                 .catch(error => res.status(409).json({  message: "Désolé l'utilisateur Existe Déja !"}));//Error : Si il existe déjà un utilisateur avec cette adresse email
         })
         .catch(error => res.status(500).json({ error }));
+    }  
 };
 
 //Création connexion pour les utilisateur déja enregistré LOGIN
