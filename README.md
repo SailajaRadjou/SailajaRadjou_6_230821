@@ -20,7 +20,7 @@ Depuis le dossier backend,
 
     - puis, toujours dans le terminal ouvert dans le dossier backend:    
         -taper: "npm install",
-        -puis: "nodemon server",
+        -puis: "node server",
        
 Le serveur sera accessible sur http://localhost:3000/
 
