@@ -66,6 +66,7 @@ exports.login = (req, res, next) => {
                     res.status(200).json({
                         userId: user._id,
                         //créé le token pour sécuriser le compte de l'utilisateur
+                        //la fonction "sign" de jsonwebtoken pour encoder un nouveau token
                         token: jwt.sign(
                             { userId: user._id },
                             `${process.env.RANDOM_TOKEN}`,
