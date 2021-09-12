@@ -38,16 +38,30 @@ exports.getOneSauce = (req, res, next) => {
 
 //modification d'une Sauce PUT
 exports.modifySauce = (req, res, next) => {
-   const sauceObject = req.file ?
-   //si l'image existe
-   {
-       ...JSON.parse(req.body.sauce),
-       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-   } : { ...req.body };
-   //si l'image n'existe pas
-    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Sauce Modifié ! '}))
-    .catch(error => res.status(400).json({ error }));
+    if (req.file) {
+        // si l'image est modifiée, il faut supprimer l'ancienne image dans le dossier /images
+        Sauce.findOne({ _id: req.params.id })
+            .then(sauce => {
+                const filename = sauce.imageUrl.split('/images/')[1];
+                fs.unlink(`images/${filename}`, () => {
+                    // une fois que l'ancienne image est supprimée dans le dossier /images, on peut mettre à jour le reste
+                    const sauceObject = {
+                        ...JSON.parse(req.body.sauce),
+                        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`                        
+                    }
+                    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                        .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
+                        .catch(error => res.status(400).json({ error }));
+                })
+            })
+            .catch(error => res.status(500).json({ error }));
+    } else {
+        // si l'image n'est pas modifiée
+        const sauceObject = { ...req.body };
+        Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+            .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
+            .catch(error => res.status(400).json({ error }));
+    }
 }
 
 //Supprimer une sauce DELETE
@@ -101,14 +115,14 @@ exports.likeDislikeSauce = (req, res, next) => {
                 if (sauce.usersLiked.includes(userId)) { 
                     //L'opérateur $pull supprime de valeurs d'un tableau , ici on retire l'utilisateur du tableau.
                     Sauce.updateOne({ _id: sauceId }, { $pull: { usersLiked: userId }, $inc: { likes: -1 }})
-                      .then(() => res.status(200).json({ message: "Neutre" }))
+                      .then(() => res.status(200).json({ message: 'Like supprimé !' }))
                       .catch((error) => res.status(400).json({ error }))
                 }
                 //Annulation DISLIKE
                 //ici on cherche si l'utilisateur est déjà dans le tableau usersDisliked
                 if (sauce.usersDisliked.includes(userId)) { 
                     Sauce.updateOne({ _id: sauceId }, { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 }})
-                        .then(() => res.status(200).json({ message: "Neutre" }))
+                        .then(() => res.status(200).json({ message: 'Dislike supprimé !' }))
                         .catch((error) => res.status(400).json({ error }))
                 }
             })
