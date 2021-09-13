@@ -5,21 +5,42 @@ const fs = require('fs');
 
 //créé une nouvelle sauce POST
 exports.createSauce = (req, res, next) => {
-    const sauceObject = JSON.parse(req.body.sauce);
+    try {
+        const sauceObject = JSON.parse(req.body.sauce);
+        
+        delete sauceObject._id;
+        Sauce.create({
+          userId: sauceObject.userId,
+          name: sauceObject.name,
+          manufacturer: sauceObject.manufacturer,
+          description: sauceObject.description,
+          mainPepper: sauceObject.mainPepper,
+          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+          heat: sauceObject.heat
+        })
+    
+        res.json({ message: 'New sauce successfully created !' })
+      } catch (error) {
+        next(error)
+      }
+}  
+    /*   const sauceObject = JSON.parse(req.body.sauce);
     // On supprime l'id généré automatiquement et envoyé par le front-end.
     // L'id de la sauce est créé par la base MongoDB lors de la création dans la base
-    delete sauceObject._id;
-
-    const sauce = new Sauce({
+   const sauce = new Sauce({
      ...sauceObject,
      //création de URL d'image
-     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+     imageUrl: ,
+     likes: 0,
+     dislikes: 0,
+     usersLiked: [],
+     usersDisliked: []
     });
     //Enregistrement de l'objet Sauce dans la base de donnée
     sauce.save()
         .then(() => res.status(201).json({ message: 'Sauce Enregistré !'}))
         .catch(error => res.status(400).json({ error }));
-}
+*/
 
 //lecture de toutes les sauces dans la DB GET
 exports.getAllSauces = (req, res, next) => {
@@ -57,7 +78,7 @@ exports.modifySauce = (req, res, next) => {
             .catch(error => res.status(500).json({ error }));
     } else {
         // si l'image n'est pas modifiée
-        const sauceObject = { ...req.body };
+        const sauceObject = { ...JSON.parse(req.body.sauce) };
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
             .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
             .catch(error => res.status(400).json({ error }));

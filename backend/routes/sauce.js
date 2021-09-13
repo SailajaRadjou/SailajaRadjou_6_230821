@@ -33,6 +33,6 @@ router.put('/:id', auth, multer, sauceControl.modifySauce);
 router.delete('/:id', auth, sauceControl.deleteSauce);
 
 // Route qui permet de gérer les likes des sauces
-router.post('/:id/like',sauceControl.likeDislikeSauce);
+router.post('/:id/like',auth,sauceControl.likeDislikeSauce);
 
 module.exports = router;

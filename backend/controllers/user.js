@@ -72,6 +72,7 @@ exports.login = (req, res, next) => {
                             `${process.env.RANDOM_TOKEN}`,
                             { expiresIn: '24h' }
                         )
+                        
                     });
                 })
                 .catch(error => res.status(500).json({ error }));
