@@ -5,43 +5,23 @@ const fs = require('fs');
 
 //créé une nouvelle sauce POST
 exports.createSauce = (req, res, next) => {
-    try {
+   
         const sauceObject = JSON.parse(req.body.sauce);
         
         delete sauceObject._id;
-        Sauce.create({
-          userId: sauceObject.userId,
-          name: sauceObject.name,
-          manufacturer: sauceObject.manufacturer,
-          description: sauceObject.description,
-          mainPepper: sauceObject.mainPepper,
-          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-          heat: sauceObject.heat
-        })
+        const sauce = new Sauce({
+            ...sauceObject,
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+            
+        });
+        sauce.save()
+        .then(() => res.status(201).json({ message: 'Sauce enregistrée !'}))
+        .catch(error => {
+            console.log(json({ error }));
+            res.status(400).json({ error });
+        });
     
-        res.json({ message: 'New sauce successfully created !' })
-      } catch (error) {
-        next(error)
-      }
-}  
-    /*   const sauceObject = JSON.parse(req.body.sauce);
-    // On supprime l'id généré automatiquement et envoyé par le front-end.
-    // L'id de la sauce est créé par la base MongoDB lors de la création dans la base
-   const sauce = new Sauce({
-     ...sauceObject,
-     //création de URL d'image
-     imageUrl: ,
-     likes: 0,
-     dislikes: 0,
-     usersLiked: [],
-     usersDisliked: []
-    });
-    //Enregistrement de l'objet Sauce dans la base de donnée
-    sauce.save()
-        .then(() => res.status(201).json({ message: 'Sauce Enregistré !'}))
-        .catch(error => res.status(400).json({ error }));
-*/
-
+ }
 //lecture de toutes les sauces dans la DB GET
 exports.getAllSauces = (req, res, next) => {
     //On utilise la méthode find() pour obtenir la liste complète des sauces trouvées dans la base de donnée
@@ -52,57 +32,91 @@ exports.getAllSauces = (req, res, next) => {
 
 //lecture une sauce avec son Id GET/:id
 exports.getOneSauce = (req, res, next) => {
+    console.log("GetoneSauce_UserId : "+req.body.userId);
     Sauce.findOne({ _id: req.params.id })
-      .then(sauce => res.status(200).json(sauce))
+      .then(sauce => {
+        console.log("GetoneSauce_SauceID : "+sauce.userId);
+      res.status(200).json(sauce)
+      }) 
       .catch(error => res.status(404).json({ error }));
 }
 
 //modification d'une Sauce PUT
 exports.modifySauce = (req, res, next) => {
+    const sauceId = req.params.id;
+    let userId = req.body.userId;
+    console.log(userId);
+    
     if (req.file) {
         // si l'image est modifiée, il faut supprimer l'ancienne image dans le dossier /images
-        Sauce.findOne({ _id: req.params.id })
+        Sauce.findById( sauceId )
+       
             .then(sauce => {
-                const filename = sauce.imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`, () => {
-                    // une fois que l'ancienne image est supprimée dans le dossier /images, on peut mettre à jour le reste
-                    const sauceObject = {
-                        ...JSON.parse(req.body.sauce),
-                        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`                        
-                    }
-                    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-                        .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
-                        .catch(error => res.status(400).json({ error }));
-                })
+                let userId = req.body.userId;
+                console.log("Sauce user id Modify " + sauce.userId );
+                console.log("req.body.userId "+userId);
+               /* if(userId !== sauce.userId){
+                    throw 'Sorry ! You have no rights. You cannot modify others shared ';
+                }
+                else{*/
+                    const filename = sauce.imageUrl.split('/images/')[1];
+                    fs.unlink(`images/${filename}`, () => {
+                        // une fois que l'ancienne image est supprimée dans le dossier /images, on peut mettre à jour le reste
+                        const sauceObject = {
+                           ...JSON.parse(req.body.sauce),
+                            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`                        
+                                             
+                        }
+                        Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                            .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
+                            .catch(error => res.status(400).json({ error }));
+                    })
+               //}    
             })
             .catch(error => res.status(500).json({ error }));
     } else {
         // si l'image n'est pas modifiée
-        const sauceObject = { ...JSON.parse(req.body.sauce) };
+        const sauceObject = { ...req.body };
+        console.log("Sauce user id Modifynoimage " + sauceObject.userId );
+        if(req.body.userId !== sauceObject.userId){
+            throw 'Sorry ! You have no rights. You cannot modify others shared ';
+        }
+        else{
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
             .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
             .catch(error => res.status(400).json({ error }));
+        }    
     }
 }
 
 //Supprimer une sauce DELETE
 exports.deleteSauce = (req, res, next) => {
-    //recupéré id de sauce depuis URL
-    Sauce.findOne({ _id: req.params.id })
+    console.log(req.body.userId);
+   //recupéré id de sauce depuis URL
+   
+    Sauce.findOne({_id: req.params.id})
     .then(sauce => {
         //récupération du nom du fichier
-        const filename = sauce.imageUrl.split('/images/')[1];
-
-        //pour supprimer l'image dans le fichier UNLINK
-        fs.unlink(`images/${filename}`, () => {
-            //supprime le sauce dans le database
-            Sauce.deleteOne({ _id: req.params.id })
-                .then(() => res.status(200).json({ message: 'Sauce Supprimé !'}))
-                .catch(error => res.status(400).json({ error }));
-        });
+        console.log("Sauce user id delete " + sauce.userId );
+        if(req.body.userId !== sauce.userId){
+            throw 'Sorry ! You have no rights. You cannot delete others shared ';
+        }
+        else{
+                
+            const filename = sauce.imageUrl.split('/images/')[1];
+        
+            //pour supprimer l'image dans le fichier UNLINK
+            fs.unlink(`images/${filename}`, () => {
+                //supprime le sauce dans le database
+                Sauce.deleteOne({ _id: req.params.id })
+                    .then(() => res.status(200).json({ message: 'Sauce Supprimé !'}))
+                    .catch(error => res.status(400).json({ error }));
+            });
+        }
     })
-    .catch(error => res.status(500).json({ error }));    
-}
+    .catch(error => res.status(500).json({ error }));   
+} 
+
 
 //LIKE ou DISLIKE
 exports.likeDislikeSauce = (req, res, next) => {

@@ -69,7 +69,7 @@ exports.login = (req, res, next) => {
                         //la fonction "sign" de jsonwebtoken pour encoder un nouveau token
                         token: jwt.sign(
                             { userId: user._id },
-                            `${process.env.RANDOM_TOKEN}`,
+                            process.env.RANDOM_TOKEN,
                             { expiresIn: '24h' }
                         )
                         
