@@ -12,7 +12,7 @@ require('dotenv').config();
 //création de nouveau utilisateur SIGNUP
 exports.signup = (req, res, next) => {
     if (!/^[A-Za-z@&_$0-9\s,'-]{6,30}$/.test(req.body.password)) {
-        return res.status(400).json({ message: 'Invalid password -- Minimum 6 letters & Special characters not allowed !'});
+        return res.status(400).json({ message: 'Invalid password -- Minimum 6 letters!'});
     }
     else{
         //HASH du mot de passe avec le bcrypt & (10) ce sera le nombre de tours qu'on fait faire à l'algorithme

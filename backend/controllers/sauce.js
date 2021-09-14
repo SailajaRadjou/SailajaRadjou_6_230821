@@ -1,7 +1,9 @@
 const Sauce = require('../models/Sauce');
+const SauceModif = require('../models/Saucemodif');
 // Récupération du module 'file system' de Node 
 //permettant de gérer ici les téléchargements et modifications d'images
 const fs = require('fs');
+const Saucemodif = require('../models/Saucemodif');
 
 //créé une nouvelle sauce POST
 exports.createSauce = (req, res, next) => {
@@ -85,15 +87,28 @@ exports.modifySauce = (req, res, next) => {
                     throw 'Sorry ! You have no rights. You cannot modify others shared '
                 }
                 else{
-                const sauceObject = {
-                    ...req.body
-                }                        
-                Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                    const sauceObject = {
+                        ...req.body
+                    }
+                    if(req.body.likes > 1)
+                    {
+                        throw 'Sorry ! You have no rights. Enter correct details'  
+                    }
+               /* const sauceObject = new SauceModif({
+                    name: req.body.name,
+                    manufacturer: req.body.manufacturer,
+                    description: req.body.description,
+                    mainPepper: req.body.mainPepper,
+                    imageUrl: req.body.imageUrl,
+                    heat: req.body.heat
+                } ); */
+                console.log(sauceObject);                      
+                Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id})
                 .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
                 .catch(error => res.status(400).json({ error }));
             } 
             })
-            .catch(error => res.status(500).json({ error }));    
+            .catch(error => res.status(500).json({ message : 'error : Enter correct details' }));    
     }
 }
 
