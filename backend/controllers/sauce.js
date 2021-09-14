@@ -90,7 +90,7 @@ exports.modifySauce = (req, res, next) => {
                     const sauceObject = {
                         ...req.body
                     }
-                    if(req.body.likes > 1)
+                    if(req.body.likes > 1 || req.body.dislikes > 1)
                     {
                         throw 'Sorry ! You have no rights. Enter correct details'  
                     }
