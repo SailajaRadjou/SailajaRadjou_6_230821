@@ -46,8 +46,8 @@ exports.modifySauce = (req, res, next) => {
     const sauceId = req.params.id;
     let userId = req.body.userId;
     console.log(userId);
-    
     if (req.file) {
+        
         // si l'image est modifiée, il faut supprimer l'ancienne image dans le dossier /images
         Sauce.findById( sauceId )
        
@@ -55,10 +55,7 @@ exports.modifySauce = (req, res, next) => {
                 let userId = req.body.userId;
                 console.log("Sauce user id Modify " + sauce.userId );
                 console.log("req.body.userId "+userId);
-               /* if(userId !== sauce.userId){
-                    throw 'Sorry ! You have no rights. You cannot modify others shared ';
-                }
-                else{*/
+                
                     const filename = sauce.imageUrl.split('/images/')[1];
                     fs.unlink(`images/${filename}`, () => {
                         // une fois que l'ancienne image est supprimée dans le dossier /images, on peut mettre à jour le reste
@@ -71,21 +68,32 @@ exports.modifySauce = (req, res, next) => {
                             .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
                             .catch(error => res.status(400).json({ error }));
                     })
-               //}    
+                                           
             })
             .catch(error => res.status(500).json({ error }));
-    } else {
-        // si l'image n'est pas modifiée
-        const sauceObject = { ...req.body };
-        console.log("Sauce user id Modifynoimage " + sauceObject.userId );
-        if(req.body.userId !== sauceObject.userId){
-            throw 'Sorry ! You have no rights. You cannot modify others shared ';
-        }
-        else{
-        Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-            .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
-            .catch(error => res.status(400).json({ error }));
-        }    
+        
+    }
+     else {
+        
+        Sauce.findById( sauceId )
+       
+            .then(sauce => {
+                console.log("Sauce user id Modifynoimage " + sauce.userId );
+                console.log("user id Modifynoimage " + userId );
+                console.log(req.body);
+                if(sauce.userId!==userId){
+                    throw 'Sorry ! You have no rights. You cannot modify others shared '
+                }
+                else{
+                const sauceObject = {
+                    ...req.body
+                }                        
+                Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+                .then(() => res.status(200).json({ message: 'Sauce modifiée avec succes!' }))
+                .catch(error => res.status(400).json({ error }));
+            } 
+            })
+            .catch(error => res.status(500).json({ error }));    
     }
 }
 

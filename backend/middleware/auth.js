@@ -15,6 +15,7 @@ module.exports = (req, res, next) => {
         // On vérifie que le userId envoyé avec la requête correspond au userId encodé dans le token
         const userId = decodedToken.userId;
         console.log("decoded token user id  " + userId );
+        console.log("req.body.userId Auth : "+req.body.userId);
         if (req.body.userId && req.body.userId !== userId) {
             throw 'Invalid User Id';// si le token ne correspond pas au userId : erreur
         }

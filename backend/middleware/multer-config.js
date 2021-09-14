@@ -12,7 +12,7 @@ const MIME_TYPES = {
 const storage = multer.diskStorage({
     //l'enregistrement dans le dossiers "images"
   destination: (req, file, callback) => {
-    callback(null, 'images');
+      callback(null, 'images');
   },
   
    //Indiqué à multer quel nom de fichier on utilise pour éviter les doublons

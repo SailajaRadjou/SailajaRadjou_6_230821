@@ -11,7 +11,7 @@ require('dotenv').config();
 
 //création de nouveau utilisateur SIGNUP
 exports.signup = (req, res, next) => {
-    if (!/^([a-z0-9]){6,}$/.test(req.body.password)) {
+    if (!/^[A-Za-z@&_$0-9\s,'-]{6,30}$/.test(req.body.password)) {
         return res.status(400).json({ message: 'Invalid password -- Minimum 6 letters & Special characters not allowed !'});
     }
     else{
